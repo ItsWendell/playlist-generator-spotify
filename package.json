@@ -1,11 +1,10 @@
 {
-	"name": "@itswendell/spotify-playlist-generator",
+	"name": "@itswendell/playlist-generator-spotify",
 	"version": "0.1.0",
 	"license": "MIT",
-	"private": true,
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ItsWendell/spotify-playlist-generator.git"
+		"url": "https://github.com/ItsWendell/playlist-generator-spotify.git"
 	},
 	"scripts": {
 		"start": "react-scripts start",
@@ -17,7 +16,7 @@
 	"dependencies": {
 		"antd": "^3.11.2",
 		"connected-react-router": "^6.0.0",
-		"moment": "^2.22.2",
+		"moment": "^2.23.0",
 		"prop-types": "^15.6.2",
 		"react": "^16.6.3",
 		"react-async": "^3.8.3",
