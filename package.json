@@ -5,7 +5,7 @@
 	"private": true,
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ItsWendell/my-spotify-charts.git"
+		"url": "https://github.com/ItsWendell/spotify-playlist-generator.git"
 	},
 	"scripts": {
 		"start": "react-scripts start",
