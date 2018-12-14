@@ -29,7 +29,6 @@ import TrackTable from 'src/organisms/track-table/track-table';
 import { logout, fetchUser, loginFromBrowserUrl } from 'src/ducks/user';
 
 class App extends Component {
-
 	constructor () {
 		super();
 		this.state = {
@@ -145,22 +144,6 @@ class App extends Component {
 				))}
 			</Row>
 		)
-	}
-
-	toggleTimeRange = (value) => {
-		if (this.state.timeRanges.includes(value)) {
-			this.setState({
-				timeRanges: this.state.timeRanges.filter((time_range) => (
-					time_range !== value
-				))
-			});
-
-			return;
-		}
-
-		this.setState({
-			timeRanges: [ ...this.state.timeRanges, value ]
-		});
 	}
 
 	/**
@@ -360,7 +343,7 @@ class App extends Component {
 												}}
 											>
 												{tag}
-											</Select.Option>a
+											</Select.Option>
 										))}
 									</Select>
 								</Col>
