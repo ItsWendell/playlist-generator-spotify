@@ -1,9 +1,9 @@
-# My Spotify Charts
+# Playlist Generator for Spotify
 
-The aim of this project was to visualize my personal trends in listening to artist and tracks on Spotify. Inpsired by the Spotify Wrapped camaign.
+Easily generate spotify playlists based on the Recommendations api from spotify.
 
-[![Latest Release](https://img.shields.io/github/release/ItsWendell/my-spotify-charts/all.svg?style=flat-square)](https://github.com/ItsWendell/my-spotify-chartsreleases)
-[![Build Status](https://img.shields.io/travis/com/ItsWendell/my-spotify-charts/develop.svg?style=flat-square)](https://travis-ci.com/ItsWendell/my-spotify-charts)
+[![Latest Release](https://img.shields.io/github/release/ItsWendell/spotify-playlist-generator/all.svg?style=flat-square)](https://github.com/ItsWendell/spotify-playlist-generatorreleases)
+[![Build Status](https://img.shields.io/travis/com/ItsWendell/spotify-playlist-generator/develop.svg?style=flat-square)](https://travis-ci.com/ItsWendell/spotify-playlist-generator)
 
 ## Start Developing
 
