@@ -1,0 +1,128 @@
+{
+	"name": "@itswendell/spotify-playlist-generator",
+	"version": "0.1.0",
+	"license": "MIT",
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ItsWendell/my-spotify-charts.git"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject",
+		"now-build": "react-scripts build && mv build dist"
+	},
+	"dependencies": {
+		"antd": "^3.11.2",
+		"connected-react-router": "^6.0.0",
+		"moment": "^2.22.2",
+		"prop-types": "^15.6.2",
+		"react": "^16.6.3",
+		"react-async": "^3.8.3",
+		"react-dom": "^16.6.3",
+		"react-helmet": "^5.2.0",
+		"react-redux": "^6.0.0",
+		"react-router-dom": "^4.3.1",
+		"redux": "^4.0.1",
+		"redux-actions": "^2.6.4",
+		"redux-devtools-extension": "^2.13.7",
+		"redux-persist": "^5.10.0",
+		"redux-promise-middleware": "^5.1.1",
+		"redux-thunk": "^2.3.0",
+		"spotify-web-api-js": "^1.1.1",
+		"styled-components": "^4.1.2"
+	},
+	"devDependencies": {
+		"@commitlint/travis-cli": "^7.2.1",
+		"@peakfijn/config-commitlint": "^0.8.3",
+		"@semantic-release/changelog": "^3.0.0",
+		"codecov": "^3.1.0",
+		"conventional-changelog-peakfijn": "^0.8.0",
+		"enzyme": "^3.8.0",
+		"enzyme-adapter-react-16": "^1.7.1",
+		"jest-chain": "^1.0.4",
+		"jest-enzyme": "^7.0.0",
+		"react-scripts": "^2.1.0",
+		"release-rules-peakfijn": "^0.8.0",
+		"semantic-release": "^15.12.5",
+		"semantic-release-git-branches": "^1.2.1",
+		"stylelint": "^9.9.0",
+		"stylelint-config-concentric-order": "^3.4.0",
+		"stylelint-config-standard": "^18.2.0",
+		"stylelint-config-styled-components": "^0.1.1",
+		"stylelint-processor-styled-components": "^1.5.1"
+	},
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not ie <= 11",
+		"not op_mini all"
+	],
+	"babelMacros": {
+		"styledComponents": {
+			"fileName": false
+		}
+	},
+	"commitlint": {
+		"extends": [
+			"@peakfijn/config-commitlint"
+		],
+		"rules": {
+			"scope-empty": [
+				0
+			],
+			"scope-enum": [
+				2,
+				"always",
+				[
+					"package"
+				]
+			]
+		}
+	},
+	"eslintConfig": {
+		"extends": "react-app",
+		"rules": {
+			"indent": [
+				"error",
+				"tab"
+			]
+		},
+		"settings": {
+			"import/resolver": {
+				"node": {
+					"moduleDirectory": [
+						"node_modules",
+						"src/"
+					]
+				}
+			}
+		}
+	},
+	"stylelint": {
+		"extends": [
+			"stylelint-config-standard",
+			"stylelint-config-concentric-order",
+			"stylelint-config-styled-components"
+		],
+		"processors": [
+			"stylelint-processor-styled-components"
+		],
+		"rules": {
+			"indentation": "tab"
+		}
+	},
+	"greenkeeper": {
+		"commitMessages": {
+			"initialBadge": "documentation: add greenkeeper badge",
+			"initialDependencies": "chore: update dependencies",
+			"initialBranches": "chore: whitelist greenkeeper branches",
+			"dependencyUpdate": "refactor: upgrade ${dependency} to version ${version}",
+			"devDependencyUpdate": "refactor: upgrade ${dependency} to version ${version}",
+			"dependencyPin": "fix: freeze ${dependency} to ${oldVersion}",
+			"devDependencyPin": "fix: freeze ${dependency} to ${oldVersion}"
+		}
+	}
+}

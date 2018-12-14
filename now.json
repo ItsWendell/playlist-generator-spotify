@@ -1,0 +1,19 @@
+{
+	"version": 2,
+	"name": "spotify-playlist-generator",
+	"alias": "spotify-playlist-generator.now.sh",
+	"builds": [
+		{ "src": "package.json", "use": "@now/static-build" }
+	],
+	"routes": [
+		{ "src": "^/robots\\.txt", "dest": "/robots.txt" },
+		{ "src": "^/static/(.*)", "dest": "/static/$1" },
+		{ "src": ".*", "dest": "/index.html" }
+	],
+	"build": {
+		"env": {
+			"NODE_PATH": "./",
+			"REACT_APP_SPOTIFY_CLIENT_ID": "@spotify-client-id"
+		}
+	}
+}

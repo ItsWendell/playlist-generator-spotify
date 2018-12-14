@@ -1,0 +1,33 @@
+---
+language: node_js
+node_js:
+  - 11
+  - 10
+os:
+  - linux
+  - osx
+cache: npm
+script:
+  - npx commitlint-travis
+  - npx stylelint './src/**/*.js'
+  - npx eslint ./src
+  - npx react-scripts test --coverage
+  - npm run build
+  - npm audit
+after_success:
+  - npx codecov
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: npx semantic-release --dry-run --branch develop
+    on:
+      node: 11
+      branch: develop
+      condition: $TRAVIS_OS_NAME = linux
+  - provider: script
+    skip_cleanup: true
+    script: npx semantic-release
+    on:
+      node: 11
+      branch: master
+      condition: $TRAVIS_OS_NAME = linux
