@@ -2,8 +2,8 @@
 
 Easily generate spotify playlists based on the Recommendations api from spotify.
 
-[![Latest Release](https://img.shields.io/github/release/ItsWendell/spotify-playlist-generator/all.svg?style=flat-square)](https://github.com/ItsWendell/spotify-playlist-generatorreleases)
-[![Build Status](https://img.shields.io/travis/com/ItsWendell/spotify-playlist-generator/develop.svg?style=flat-square)](https://travis-ci.com/ItsWendell/spotify-playlist-generator)
+[![Latest Release](https://img.shields.io/github/release/ItsWendell/playlist-generator-spotify/all.svg?style=flat-square)](https://github.com/ItsWendell/playlist-generator-spotify/releases)
+[![Build Status](https://img.shields.io/travis/com/ItsWendell/playlist-generator-spotify/develop.svg?style=flat-square)](https://travis-ci.com/ItsWendell/playlist-generator-spotify)
 
 ## Start Developing
 
