@@ -1,3 +1,15 @@
+## [1.1.1](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.1.0...1.1.1) (2018-12-15)
+
+
+### Bug fixes
+
+* tempo slider not properly passing on values ([3a74284](https://github.com/ItsWendell/playlist-generator-spotify/commit/3a74284))
+
+
+### Code refactors
+
+* minor button style changes and added github button to layout ([64111bb](https://github.com/ItsWendell/playlist-generator-spotify/commit/64111bb))
+
 # [1.1.0](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.0.0...1.1.0) (2018-12-15)
 
 
