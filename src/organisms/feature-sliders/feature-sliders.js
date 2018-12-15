@@ -77,7 +77,7 @@ export default function FeatureSliders({ onChange, values }) {
 					defaultValue={[0, 300]}
 					step={2}
 					onChange={(values) => {
-						onChange && onChange('tempo', values.map((item) => item));
+						onChange && onChange('tempo', values);
 					}}
 				/>
 				<Label>

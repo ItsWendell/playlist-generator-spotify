@@ -158,7 +158,7 @@ class App extends Component {
 						) : (
 							<Container center>
 								<HeroTitle>Login to get started!</HeroTitle>
-								<Button onClick={() => this.authenticate()}>Login to Spotify</Button>
+								<Button icon="login" size="large" ghost onClick={() => this.authenticate()}>Login to Spotify</Button>
 							</Container>
 						)}
 					</Col>
@@ -183,7 +183,6 @@ class App extends Component {
 				seed_tracks: selectedTracks.join(','),
 			})
 			.then((data) => {
-				console.log('Seeded Playlist', data);
 				this.setState({ generatedPlaylist: data });
 			})
 			.finally(() => {
@@ -228,14 +227,23 @@ class App extends Component {
 						</Col>
 						<Col span={6} style={{ textAlign: 'right' }}>
 							{!user ? (
-								<Button onClick={() => this.authenticate()}>Login to Spotify</Button>
+								<Button icon="login" type="primary" onClick={() => this.authenticate()}>Login to Spotify</Button>
 							) : (
-								<Button onClick={() => logoutAction()
-									.then(() => window.location.reload())
-								}>
+								<Button
+									onClick={() => logoutAction()
+										.then(() => window.location.reload())
+									}
+								>
 									Logout
 								</Button>
 							)}
+							<Button
+								icon="github"
+								href="https://github.com/ItsWendell/playlist-generator-spotify"
+								style={{ marginLeft: '0.5rem' }}
+							>
+								It's open source!
+							</Button>
 						</Col>
 					</Row>
 				</Layout.Header>
@@ -372,11 +380,13 @@ class App extends Component {
 					</section>
 				</Layout.Content>
 				<Layout.Footer>
-					<Row>
-						<Col span={12}>
-							<p></p>
-						</Col>
-					</Row>
+					<Container>
+						<Row align="middle" justify="center">
+							<Col span={24} style={{ textAlign: 'center' }}>
+								<Button icon="github" href="https://github.com/ItsWendell/playlist-generator-spotify">It's open source!</Button>
+							</Col>
+						</Row>
+					</Container>
 				</Layout.Footer>
 			</Layout>
 		);
