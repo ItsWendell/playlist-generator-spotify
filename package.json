@@ -46,7 +46,7 @@
 		"jest-enzyme": "^7.0.0",
 		"react-scripts": "^2.1.0",
 		"release-rules-peakfijn": "^0.8.0",
-		"semantic-release": "^15.12.5",
+		"semantic-release": "^15.13.0",
 		"semantic-release-git-branches": "^1.2.1",
 		"stylelint": "^9.9.0",
 		"stylelint-config-concentric-order": "^3.4.0",
