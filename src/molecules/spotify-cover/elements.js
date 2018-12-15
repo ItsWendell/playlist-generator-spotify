@@ -24,7 +24,9 @@ export const ContentOverlay = styled.div`
 	opacity: 0;
 `;
 
-export const CoverContainer = styled.div`
+export const CoverContainer = styled.a`
+	display: block;
+
 	:hover {
 		* {
 			opacity: 1;

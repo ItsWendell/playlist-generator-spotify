@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 
 import { connect } from 'react-redux';
+import { logout, fetchUser, loginFromBrowserUrl } from 'src/ducks/user';
 import {
 	selectPlaylists,
 	selectPlaylistsLoading,
 	fetchMyTopTracks,
-	selectAllTracks,
-	topTracksTimeRanges
+	selectAllTracks
 } from 'src/ducks/playlists';
 
-import { spotifyClient, audioFeatures } from 'src/providers/spotify';
+import { spotifyClient } from 'src/providers/spotify';
 
 import Layout from 'src/molecules/layout';
 import Row from 'src/molecules/row';
@@ -20,23 +20,17 @@ import PageHero, { HeroTitle, HeroSubtitle } from 'src/molecules/page-hero';
 import Cover from 'src/molecules/spotify-cover';
 
 import Container from 'src/atoms/container';
-import Slider from 'src/atoms/slider';
 import Button from 'src/atoms/button';
 import Select from 'src/atoms/select';
 
 import TrackTable from 'src/organisms/track-table/track-table';
-
-import { logout, fetchUser, loginFromBrowserUrl } from 'src/ducks/user';
+import FeatureSliders from 'src/organisms/feature-sliders/feature-sliders';
 
 class App extends Component {
 	constructor () {
 		super();
 		this.state = {
 			playlists: [],
-			loading: false,
-			user: {},
-			tracks: [],
-			timeRanges: Object.keys(topTracksTimeRanges) || [],
 			audioFeatures: {},
 			selectedGenres: [],
 			selectedArtists: [],
@@ -44,6 +38,7 @@ class App extends Component {
 			generatedPlaylist: {},
 			searchArtists: [],
 			searchTracks: [],
+			loadingTracks: false,
 		};
 	}
 
@@ -72,7 +67,6 @@ class App extends Component {
 			});
 	}
 
-
 	componentDidMount() {
 		const {
 			loginFromBrowserUrlAction
@@ -95,16 +89,6 @@ class App extends Component {
 		]);
 	}
 
-	/**
-	 * Render the playlist table.
-	 */
-	renderDashboard() {
-		const { playlists } = this.props;
-		return !this.state.loading && playlists && playlists.length > 0 && (
-			this.renderPlaylists()
-		);
-	}
-
 	renderCovers() {
 		const { playlists } = this.state;
 
@@ -121,51 +105,40 @@ class App extends Component {
 				item.images[0].url) ||
 				(item.album.images &&
 				item.album.images.length &&
-				item.album.images[0].url)
+				item.album.images[0].url),
+			href: item.external_urls && item.external_urls.spotify,
 		});
 
 		let items;
 
 		if (!generatedPlaylist || !generatedPlaylist.tracks) {
-			items = playlists.slice(0, 12).map(mapCovers);
+			items = playlists;
 		} else {
-			items = generatedPlaylist.tracks.slice(0, 12).map(mapCovers);
+			items = generatedPlaylist.tracks;
 		}
+
+		items = items
+			.map(mapCovers)
+			// Remove double covers
+			.filter((item, index, self) => (
+				index === self.findIndex((t) => (
+					t.cover === item.cover
+				))
+			))
+			.slice(0, 12)
 
 		return (
 			<Row type="flex" gutter={16}>
-				{items.map((playlist) => (
-					<Col key={playlist.id} span={4} style={{ padding: '0.5rem' }}>
+				{items.map((item) => (
+					<Col key={item.id} span={4} style={{ padding: '0.5rem' }}>
 						<Cover
-							cover={playlist.cover}
-							// artist={playlist.name}
+							cover={item.cover}
+							href={item.href}
 						/>
 					</Col>
 				))}
 			</Row>
 		)
-	}
-
-	/**
-	 * Render the playlists and positions based on the first playlist in the state.
-	 */
-	renderPlaylists() {
-		const { generatedPlaylist } = this.state;
-
-		const tracks = generatedPlaylist.tracks;
-
-		if (!tracks) {
-			return null;
-		}
-
-		return (
-			<Row>
-				<h2>Generated Playlist</h2>
-				<Row>
-					<TrackTable tracks={tracks} />
-				</Row>
-			</Row>
-		);
 	}
 
 	renderHero() {
@@ -176,14 +149,13 @@ class App extends Component {
 			<PageHero>
 				<Row type="flex" align="middle">
 					<Col span={24}>
-						{user && (
+						{user ? (
 							<Container center>
 								<HeroTitle>Hi {userName}!</HeroTitle>
 								<HeroSubtitle>Let's generate your own custom playlists!</HeroSubtitle>
 								{this.renderCovers()}
 							</Container>
-						)}
-						{!user && (
+						) : (
 							<Container center>
 								<HeroTitle>Login to get started!</HeroTitle>
 								<Button onClick={() => this.authenticate()}>Login to Spotify</Button>
@@ -195,75 +167,39 @@ class App extends Component {
 		);
 	}
 
-	renderRecommendationSliders() {
-		return (
-			<Row type="flex" align="middle" justify="center" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-				{Object.keys(audioFeatures).map((audioFeature) => {
-					return (
-						<Col
-							key={`slider-${audioFeature}`}
-							span={3}
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								flexDirection: 'column',
-							}}
-						>
-							<Slider
-								style={{ minHeight: '12rem' }}
-								key={audioFeature}
-								vertical
-								min={0}
-								max={100}
-								defaultValue={0}
-								step={1}
-								onChange={(value) => this.setState({
-									audioFeatures: {
-										...this.state.audioFeatures,
-										[audioFeature]: value / 100,
-									}
-								})}
-							/>
-							<label
-								style={{ fontWeight: 'bold', marginTop: '1rem' }}
-							>
-								{audioFeatures[audioFeature]}
-							</label>
-						</Col>
-					);
-				})}
-			</Row>
-		)
-	}
-
-	handleGenreChange(tag, checked) {
-		const { selectedGenres } = this.state;
-		const nextSelectedTags = checked
-			? [...selectedGenres, tag]
-			: selectedGenres.filter(t => t !== tag);
-		this.setState({ selectedGenres: nextSelectedTags });
-	}
-
 	submitPlaylist = () => {
-		const { audioFeatures, selectedGenres } = this.state;
-		spotifyClient.getRecommendations({
-			...Object.keys(audioFeatures)
-				.reduce((features, audioFeature) => {
-					features[`target_${audioFeature}`] = audioFeatures[audioFeature];
-					return features;
-				}, {}),
-			seed_genres: selectedGenres.join(',')
-		})
+		const { audioFeatures, selectedGenres, selectedArtists, selectedTracks } = this.state;
+		this.setState({ loadingTracks: true });
+		spotifyClient
+			.getRecommendations({
+				...Object.keys(audioFeatures)
+					.reduce((features, audioFeature) => {
+						features[`min_${audioFeature}`] = audioFeatures[audioFeature][0];
+						features[`max_${audioFeature}`] = audioFeatures[audioFeature][1];
+						return features;
+					}, {}),
+				seed_genres: selectedGenres.join(','),
+				seed_artists: selectedArtists.join(','),
+				seed_tracks: selectedTracks.join(','),
+			})
 			.then((data) => {
 				console.log('Seeded Playlist', data);
 				this.setState({ generatedPlaylist: data });
+			})
+			.finally(() => {
+				this.setState({ loadingTracks: false });
 			})
 	}
 
 	onArtistsSearch = (value) => {
 		spotifyClient.searchArtists(value).then(({artists}) => {
-			// console.log('artists', artists);
 			this.setState({ searchArtists: artists.items });
+		});
+	}
+
+	onTrackSearch = (value) => {
+		spotifyClient.searchTracks(value).then(({ tracks }) => {
+			this.setState({ searchTracks: tracks.items });
 		});
 	}
 
@@ -281,14 +217,7 @@ class App extends Component {
 
 	render () {
 		const { user, logoutAction } = this.props;
-		const {
-			genreSeeds,
-			selectedGenres,
-			searchArtists,
-			selectedArtists,
-			searchTracks,
-			selectedTracks,
-		} = this.state;
+		const { genreSeeds, searchTracks } = this.state;
 		return (
 			<Layout>
 				<BackTop />
@@ -315,7 +244,15 @@ class App extends Component {
 					<section id="audio-features">
 						<Container style={{ marginTop: '2rem' }}>
 							<h2>Audio Features</h2>
-							{this.renderRecommendationSliders()}
+							<FeatureSliders
+								onChange={(key, value) => this.setState({
+									audioFeatures: {
+										...this.state.audioFeatures,
+										[key]: value,
+									}
+								})}
+								values={this.state.audioFeatures}
+							/>
 						</Container>
 					</section>
 					<section id="seeds">
@@ -327,16 +264,18 @@ class App extends Component {
 									<h3>Genres</h3>
 									<Select
 										allowClear
-										showSearch
-										mode="tags"
+										mode="multiple"
 										placeholder="Select genres for this playlist (optional)"
-										onChange={checked => this.setState({ selectedGenres: checked })}
-										style={{ width: '100%' }}
+										onChange={checked => {
+											!!this.getSeedsLeft() && this.setState({ selectedGenres: checked }, () => {
+												this.submitPlaylist();
+											});
+										}}
+										style={{ width: '100%', textTransform: 'capitalize' }}
 									>
 										{genreSeeds && genreSeeds.map(tag => (
 											<Select.Option
 												key={tag}
-												checked={selectedGenres.indexOf(tag) > -1}
 												style={{
 													marginBottom: '1rem',
 													textTransform: 'capitalize',
@@ -350,22 +289,30 @@ class App extends Component {
 								<Col span={8}>
 									<h3>Artists</h3>
 									<Select
-										disabled
-										showSearch
-										mode="tags"
+										mode="multiple"
+										allowClear
+										defaultActiveFirstOption={false}
+										showArrow={false}
+										filterOption={false}
 										placeholder="Select artists for this playlist (optional)"
-										onChange={checked => this.setState({ selectedArtists: checked })}
+										onChange={checked => {
+											!!this.getSeedsLeft() && this.setState({ selectedArtists: checked }, () => {
+												this.submitPlaylist();
+											});
+										}}
 										style={{ width: '100%' }}
 										onSearch={this.onArtistsSearch}
+										value={this.state.selectedArtists}
 									>
-										{searchArtists && searchArtists.map(artist => (
+										{this.state.searchArtists && this.state.searchArtists.map(artist => (
 											<Select.Option
 												key={artist.id}
-												checked={selectedArtists.indexOf(artist.id) > -1}
 												style={{
 													marginBottom: '1rem',
 													textTransform: 'capitalize',
 												}}
+												title={artist.name}
+												value={artist.id}
 											>
 												{artist.name}
 											</Select.Option>
@@ -375,25 +322,32 @@ class App extends Component {
 								<Col span={8}>
 									<h3>Tracks</h3>
 									<Select
-										disabled
-										showSearch
-										large
-										mode="tags"
-										placeholder="Select genres for this playlist (optional)"
-										onChange={checked => this.setState({ selectedTracks: checked })}
-										onSearch={search => console.log('track search', search)}
+										mode="multiple"
+										defaultActiveFirstOption={false}
+										showArrow={false}
+										filterOption={false}
+										placeholder="Select tracks for this playlist (optional)"
+										onChange={checked => {
+											!!this.getSeedsLeft() &&
+											this.setState({ selectedTracks: checked }, () => {
+												this.submitPlaylist();
+											});
+
+										}}
+										onSearch={this.onTrackSearch}
 										style={{ width: '100%' }}
 									>
-										{searchTracks && searchTracks.map(tag => (
+										{searchTracks && searchTracks.map(track => (
 											<Select.Option
-												key={tag}
-												checked={selectedTracks.indexOf(tag) > -1}
+												key={track.id}
+												tilte={track.name}
+												value={track.id}
 												style={{
 													marginBottom: '1rem',
 													textTransform: 'capitalize',
 												}}
 											>
-												{tag}
+												{track.name} {track.artists && track.artists.length && `- ${track.artists[0].name}`}
 											</Select.Option>
 										))}
 									</Select>
@@ -408,17 +362,22 @@ class App extends Component {
 					</section>
 					<section id="results">
 						<Container>
-							<Row align="middle" justify="center" >
+							<h2>Generated Playlist</h2>
+							<Row align="middle" justify="center">
 								<Col span={24}>
-									{
-										this.state.generatedPlaylist &&
-										this.renderPlaylists()
-									}
+									<TrackTable loading={this.state.loadingTracks} tracks={this.state.generatedPlaylist && this.state.generatedPlaylist.tracks} />
 								</Col>
 							</Row>
 						</Container>
 					</section>
 				</Layout.Content>
+				<Layout.Footer>
+					<Row>
+						<Col span={12}>
+							<p></p>
+						</Col>
+					</Row>
+				</Layout.Footer>
 			</Layout>
 		);
 	}

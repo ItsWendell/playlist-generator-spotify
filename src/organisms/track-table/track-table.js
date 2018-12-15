@@ -11,8 +11,8 @@ const Cover = styled(SpotifyCover)`
     max-width: 4rem;
 `;
 
-export default function TrackTable({ playlists, tracks }) {
-	const dataSource = tracks
+export default function TrackTable({ playlists, tracks, loading }) {
+	const dataSource = tracks && tracks
 		// Filter out double track id's
 		.filter((track, index, all) =>
 			index === all.findIndex((result) => (
@@ -38,15 +38,17 @@ export default function TrackTable({ playlists, tracks }) {
 					return positions;
 				}, {}),
 			popularity: track.popularity,
+			href: track.external_urls && track.external_urls.spotify,
 		}));
 
 	// Defining the columms, sorting and optionally rendering
 	const columns = [
 		{
 			dataIndex: 'cover',
-			render: (cover) => (
+			render: (cover, item) => (
 				<Cover
 					cover={cover}
+					href={item.href}
 				/>
 			)
 		},
@@ -60,7 +62,7 @@ export default function TrackTable({ playlists, tracks }) {
 			title: 'Artist',
 			dataIndex: 'artist',
 			primary: true,
-			filters: [...new Set(dataSource.map((track) => track.artist))]
+			filters: dataSource && [...new Set(dataSource.map((track) => track.artist))]
 				.map((artist) => ({
 					text: artist,
 					value: artist,
@@ -111,6 +113,7 @@ export default function TrackTable({ playlists, tracks }) {
 			pagination={false}
 			columns={columns}
 			dataSource={dataSource}
+			loading={loading}
 		>
 		</Table>
 	);
