@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.0.0...1.1.0) (2018-12-15)
+
+
+### New features
+
+* major code cleanup and improvements for playlists and filters ([f6af1de](https://github.com/ItsWendell/playlist-generator-spotify/commit/f6af1de))
+
 # 1.0.0 (2018-12-15)
 
 
