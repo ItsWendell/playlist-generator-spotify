@@ -11,7 +11,7 @@ To get started playing around in this app first ofcourse clone this repo.
 
 This web app is build using a minimal Create React App setup and is all client-side. The app directly connects to the Spotify API. 
 
-In order to connect to the Spotify API we need a Client ID in our environment variables. Create one at the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) for free.
+In order to connect to the Spotify Web API you need a Client ID in your environment variables. Create one at the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/) for free.
 
 For local development copy the `.env.example` into `.env` and set your `REACT_APP_SPOTIFY_CLIENT_ID` to your custom client ID.
 
@@ -33,6 +33,14 @@ $ now secret add REACT_APP_SPOTIFY_CLIENT_ID=YOUR_CLIENT_ID
 $ now
 ```
 
+## Resources
+
+* [Atomic Design Principles](https://github.com/ItsWendell/playlist-generator-spotify) - Methodology for creating design systems.
+* [Zeit Now](https://zeit.co/now) - Global Serverless Deployments.
+* [Create React App](https://github.com/facebook/create-react-app) - Set up a modern web app by running one command.
+* [Spotify Web API](https://developer.spotify.com/documentation/web-api/reference/) - Spotify Web API Documentation.
+* [Ant Design](https://ant.design/) - Design System and Component Library.
+
 ## Contributing
 
 Contributions are always welcome.
@@ -44,10 +52,6 @@ To keep the project healthy and running smoothly, a couple of rules are defined.
 3. Adhere the code styling and make sure CI passes.
 
 Make something awesome!
-
-## Contributors
-
-* [byCedric](https://github.com/byCedric) - Code structure is based on his [Github Website](https://github.com/byCedric/GitHub-Website) project.
 
 ## License
 
