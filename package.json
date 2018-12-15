@@ -2,6 +2,7 @@
 	"name": "@itswendell/playlist-generator-spotify",
 	"version": "0.1.0",
 	"license": "MIT",
+	"private": true,
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ItsWendell/playlist-generator-spotify.git"
