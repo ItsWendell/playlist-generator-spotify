@@ -32,7 +32,7 @@
 		"redux-promise-middleware": "^5.1.1",
 		"redux-thunk": "^2.3.0",
 		"spotify-web-api-js": "^1.1.1",
-		"styled-components": "^4.1.2"
+		"styled-components": "^4.1.3"
 	},
 	"devDependencies": {
 		"@commitlint/travis-cli": "^7.2.1",
@@ -46,7 +46,7 @@
 		"jest-enzyme": "^7.0.0",
 		"react-scripts": "^2.1.0",
 		"release-rules-peakfijn": "^0.8.0",
-		"semantic-release": "^15.13.0",
+		"semantic-release": "^15.13.1",
 		"semantic-release-git-branches": "^1.2.1",
 		"stylelint": "^9.9.0",
 		"stylelint-config-concentric-order": "^3.4.0",
