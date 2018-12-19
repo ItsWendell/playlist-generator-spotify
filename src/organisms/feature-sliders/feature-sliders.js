@@ -19,19 +19,17 @@ export const audioFeatures = {
 	"valence": 'Positivity',
 };
 
-export default function FeatureSliders({ onChange, values }) {
+export default function FeatureSliders({ onChange, onAfterChange, values }) {
 	return (
 		<Row type="flex" align="middle" justify="center" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
 			{ Object.keys(audioFeatures).map((audioFeature) => (
 				<Col
 					key={`slider-${audioFeature}`}
-					span={3}
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						flexDirection: 'column',
-					}}
+					span={24}
 				>
+					<Label>
+						{audioFeatures[audioFeature]}
+					</Label>
 					<Slider
 						range
 						marks={{
@@ -39,30 +37,27 @@ export default function FeatureSliders({ onChange, values }) {
 							100: 'High',
 						}}
 						defaultValue={[0, 100]}
-						style={{ minHeight: '12rem' }}
+						style={{ width: '100%' }}
 						key={audioFeature}
-						vertical
 						min={0}
 						max={100}
 						step={1}
 						onChange={(values) => {
 							onChange && onChange(audioFeature, values.map((item) => item / 100));
 						}}
+						onAfterChange={(values) => {
+							onAfterChange && onAfterChange(audioFeature, values.map((item) => item / 100));
+						}}
 					/>
-					<Label>
-						{audioFeatures[audioFeature]}
-					</Label>
 				</Col>
 			)) }
 			<Col
 				key={`slider-tempo`}
-				span={3}
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					flexDirection: 'column',
-				}}
+				span={24}
 			>
+				<Label>
+					Tempo (BPM)
+				</Label>
 				<Slider
 					range
 					min={0}
@@ -71,18 +66,17 @@ export default function FeatureSliders({ onChange, values }) {
 						0: 'Low',
 						300: 'High',
 					}}
-					style={{ minHeight: '12rem' }}
+					style={{ width: '100%' }}
 					key='tempo'
-					vertical
 					defaultValue={[0, 300]}
 					step={2}
 					onChange={(values) => {
 						onChange && onChange('tempo', values);
 					}}
+					onAfterChange={(values) => {
+						onAfterChange && onAfterChange('tempo', values.map((item) => item / 100));
+					}}
 				/>
-				<Label>
-					Tempo (BPM)
-				</Label>
 			</Col>
 		</Row>
 	)

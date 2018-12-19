@@ -1,5 +1,6 @@
 import styled from 'styled-components/macro';
 
+import Icon from 'src/atoms/icon';
 /**
  * The user container defines some basic styling for all elements inside.
  */
@@ -9,6 +10,26 @@ export const Image = styled.img`
     object-fit: cover;
 	display: block;
 	vertical-align: middle;
+`;
+
+export const CloseDiv = styled.div`
+	display: flex;
+	position: absolute;
+	top: 0.5rem;
+	left: 0.5rem;
+	color: white;
+	align-items: center;
+	justify-content: center;
+	width: 1rem;
+	height: 1rem;
+`;
+
+export const CloseIcon = styled(Icon)`
+	transition: transform 0.3s ease-in-out;
+
+	:hover {
+		transform: scale(1.5);
+	}
 `;
 
 export const ContentOverlay = styled.div`

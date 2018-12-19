@@ -25,6 +25,7 @@ import Select from 'src/atoms/select';
 
 import TrackTable from 'src/organisms/track-table/track-table';
 import FeatureSliders from 'src/organisms/feature-sliders/feature-sliders';
+import SearchBar from 'src/organisms/search-bar';
 
 class App extends Component {
 	constructor () {
@@ -33,11 +34,8 @@ class App extends Component {
 			playlists: [],
 			audioFeatures: {},
 			selectedGenres: [],
-			selectedArtists: [],
-			selectedTracks: [],
+			selectedSeeds: [],
 			generatedPlaylist: {},
-			searchArtists: [],
-			searchTracks: [],
 			loadingTracks: false,
 		};
 	}
@@ -89,55 +87,51 @@ class App extends Component {
 		]);
 	}
 
-	renderCovers() {
-		const { playlists } = this.state;
+	renderSelectedSeeds = () => {
+		const { selectedSeeds } = this.state;
 
-		const { generatedPlaylist } = this.state;
-
-		if (!playlists && !generatedPlaylist) {
-			return null;
-		}
-
-		const mapCovers = (item) => ({
-			id: item.snapshot_id || item.id,
-			cover: (item.images &&
+		const mapCovers = (item) => {
+			const artist = item.artists && item.artists[0] && item.artists[0].name;
+			return {
+				id: item.snapshot_id || item.id,
+				cover: (item.images &&
 				item.images.length &&
 				item.images[0].url) ||
 				(item.album.images &&
 				item.album.images.length &&
 				item.album.images[0].url),
-			href: item.external_urls && item.external_urls.spotify,
-		});
-
-		let items;
-
-		if (!generatedPlaylist || !generatedPlaylist.tracks) {
-			items = playlists;
-		} else {
-			items = generatedPlaylist.tracks;
+				href: item.external_urls && item.external_urls.spotify,
+				artist: artist,
+				name: item.name,
+			}
 		}
 
-		items = items
+		const items = selectedSeeds
 			.map(mapCovers)
-			// Remove double covers
-			.filter((item, index, self) => (
-				index === self.findIndex((t) => (
-					t.cover === item.cover
-				))
-			))
-			.slice(0, 12)
 
+		if (!items.length) {
+			return (<p>Start searching for artists or tracks...</p>);
+		}
 		return (
-			<Row type="flex" gutter={16}>
-				{items.map((item) => (
-					<Col key={item.id} span={4} style={{ padding: '0.5rem' }}>
-						<Cover
-							cover={item.cover}
-							href={item.href}
-						/>
-					</Col>
-				))}
-			</Row>
+			<div>
+				<p>Options left including genres: {this.getSeedsLeft()}</p>
+				<Row style={{ flexWrap: 'nowrap' }} type="flex" gutter={16}>
+					{items.map((item) => (
+						<Col style={{ maxWidth: '20%', textAlign: 'center' }} key={item.id}>
+							<Cover
+								cover={item.cover}
+								name={item.name}
+								artist={item.artist}
+								href={item.href}
+								onClose={() => this.onRemoveSeedById(item.id)}
+							/>
+							<div style={{ marginTop: '0.5rem' }}>
+								<label style={{ textAlign: 'center' }}>{item.name}</label>
+							</div>
+						</Col>
+					))}
+				</Row>
+			</div>
 		)
 	}
 
@@ -153,7 +147,7 @@ class App extends Component {
 							<Container center>
 								<HeroTitle>Hi {userName}!</HeroTitle>
 								<HeroSubtitle>Let's generate your own custom playlists!</HeroSubtitle>
-								{this.renderCovers()}
+								<SearchBar disabled={!this.getSeedsLeft()} onSelect={this.onSelectSeed} />
 							</Container>
 						) : (
 							<Container center>
@@ -168,8 +162,16 @@ class App extends Component {
 	}
 
 	submitPlaylist = () => {
-		const { audioFeatures, selectedGenres, selectedArtists, selectedTracks } = this.state;
+		const { audioFeatures, selectedGenres, selectedSeeds } = this.state;
 		this.setState({ loadingTracks: true });
+		const selectedArtists = selectedSeeds
+			.filter((item) => !item.artists)
+			.map((item) => item.id);
+
+		const selectedTracks = selectedSeeds
+			.filter((item) => !!item.artists)
+			.map((item) => item.id);
+
 		spotifyClient
 			.getRecommendations({
 				...Object.keys(audioFeatures)
@@ -190,33 +192,35 @@ class App extends Component {
 			})
 	}
 
-	onArtistsSearch = (value) => {
-		spotifyClient.searchArtists(value).then(({artists}) => {
-			this.setState({ searchArtists: artists.items });
-		});
+	onSelectSeed = (item) => {
+		if (!!this.getSeedsLeft() && !this.state.selectedSeeds.includes(item)) {
+			this.setState({
+				selectedSeeds: [
+					...this.state.selectedSeeds,
+					item
+				]
+			}, () => this.submitPlaylist());
+		}
 	}
 
-	onTrackSearch = (value) => {
-		spotifyClient.searchTracks(value).then(({ tracks }) => {
-			this.setState({ searchTracks: tracks.items });
-		});
+	onRemoveSeedById = (id) => {
+		this.setState({ selectedSeeds: this.state.selectedSeeds.filter((item) => item.id !== id)});
 	}
 
 	getSeedsLeft = () => {
 		const maxSeeds = 5;
-		const { selectedGenres, selectedArtists, selectedTracks } = this.state;
-		const selectedSeeds = selectedGenres.length +
-			selectedArtists.length +
-			selectedTracks.length;
+		const { selectedGenres, selectedSeeds } = this.state;
+		const total = selectedGenres.length +
+			selectedSeeds.length;
 
-		return selectedSeeds <= maxSeeds ?
-			maxSeeds - selectedSeeds :
+		return total <= maxSeeds ?
+			maxSeeds - total :
 			0;
 	}
 
 	render () {
 		const { user, logoutAction } = this.props;
-		const { genreSeeds, searchTracks } = this.state;
+		const { genreSeeds } = this.state;
 		return (
 			<Layout>
 				<BackTop />
@@ -249,37 +253,38 @@ class App extends Component {
 				</Layout.Header>
 				<Layout.Content>
 					{this.renderHero()}
-					<section id="audio-features">
-						<Container style={{ marginTop: '2rem' }}>
-							<h2>Audio Features</h2>
-							<FeatureSliders
-								onChange={(key, value) => this.setState({
-									audioFeatures: {
-										...this.state.audioFeatures,
-										[key]: value,
-									}
-								})}
-								values={this.state.audioFeatures}
-							/>
-						</Container>
-					</section>
-					<section id="seeds">
-						<Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-							<h2>Seeds (Genres, Artists, Tracks)</h2>
-							<p>Seeds left: {this.getSeedsLeft()}</p>
-							<Row gutter={16}>
-								<Col span={8}>
+					<Container>
+						<Layout>
+							<Layout.Content style={{ paddingRight: '2rem' }}>
+								<section id="seeds">
+									<h2>Your Seeds</h2>
+									{this.renderSelectedSeeds()}
+								</section>
+								<section id="playlist">
+									<h2>Generated Playlist</h2>
+									<Row align="middle" justify="center">
+										<Col span={24}>
+											<TrackTable loading={this.state.loadingTracks} tracks={this.state.generatedPlaylist && this.state.generatedPlaylist.tracks} />
+										</Col>
+									</Row>
+								</section>
+							</Layout.Content>
+							<Layout.Sider width={300} style={{ backgroundColor: 'transparent' }}>
+								<section id="audio-features">
+									<h2>Audio Features</h2>
 									<h3>Genres</h3>
 									<Select
 										allowClear
 										mode="multiple"
 										placeholder="Select genres for this playlist (optional)"
 										onChange={checked => {
-											!!this.getSeedsLeft() && this.setState({ selectedGenres: checked }, () => {
-												this.submitPlaylist();
-											});
+											if (this.getSeedsLeft()) {
+												this.setState({ selectedGenres: checked }, () => {
+													this.submitPlaylist();
+												});
+											}
 										}}
-										style={{ width: '100%', textTransform: 'capitalize' }}
+										style={{ width: '100%', textTransform: 'capitalize', marginBottom: '1rem' }}
 									>
 										{genreSeeds && genreSeeds.map(tag => (
 											<Select.Option
@@ -293,91 +298,21 @@ class App extends Component {
 											</Select.Option>
 										))}
 									</Select>
-								</Col>
-								<Col span={8}>
-									<h3>Artists</h3>
-									<Select
-										mode="multiple"
-										allowClear
-										defaultActiveFirstOption={false}
-										showArrow={false}
-										filterOption={false}
-										placeholder="Select artists for this playlist (optional)"
-										onChange={checked => {
-											!!this.getSeedsLeft() && this.setState({ selectedArtists: checked }, () => {
-												this.submitPlaylist();
-											});
-										}}
-										style={{ width: '100%' }}
-										onSearch={this.onArtistsSearch}
-										value={this.state.selectedArtists}
-									>
-										{this.state.searchArtists && this.state.searchArtists.map(artist => (
-											<Select.Option
-												key={artist.id}
-												style={{
-													marginBottom: '1rem',
-													textTransform: 'capitalize',
-												}}
-												title={artist.name}
-												value={artist.id}
-											>
-												{artist.name}
-											</Select.Option>
-										))}
-									</Select>
-								</Col>
-								<Col span={8}>
-									<h3>Tracks</h3>
-									<Select
-										mode="multiple"
-										defaultActiveFirstOption={false}
-										showArrow={false}
-										filterOption={false}
-										placeholder="Select tracks for this playlist (optional)"
-										onChange={checked => {
-											!!this.getSeedsLeft() &&
-											this.setState({ selectedTracks: checked }, () => {
-												this.submitPlaylist();
-											});
-
-										}}
-										onSearch={this.onTrackSearch}
-										style={{ width: '100%' }}
-									>
-										{searchTracks && searchTracks.map(track => (
-											<Select.Option
-												key={track.id}
-												tilte={track.name}
-												value={track.id}
-												style={{
-													marginBottom: '1rem',
-													textTransform: 'capitalize',
-												}}
-											>
-												{track.name} {track.artists && track.artists.length && `- ${track.artists[0].name}`}
-											</Select.Option>
-										))}
-									</Select>
-								</Col>
-							</Row>
-						</Container>
-					</section>
-					<section id="submit">
-						<Container center style={{ marginBottom: '2rem' }}>
-							<Button onClick={this.submitPlaylist}>Generate Playlist</Button>
-						</Container>
-					</section>
-					<section id="results">
-						<Container>
-							<h2>Generated Playlist</h2>
-							<Row align="middle" justify="center">
-								<Col span={24}>
-									<TrackTable loading={this.state.loadingTracks} tracks={this.state.generatedPlaylist && this.state.generatedPlaylist.tracks} />
-								</Col>
-							</Row>
-						</Container>
-					</section>
+									<h3>Properties</h3>
+									<FeatureSliders
+										onChange={(key, value) => this.setState({
+											audioFeatures: {
+												...this.state.audioFeatures,
+												[key]: value,
+											}
+										})}
+										onAfterChange={() => this.submitPlaylist()}
+										values={this.state.audioFeatures}
+									/>
+								</section>
+							</Layout.Sider>
+						</Layout>
+					</Container>
 				</Layout.Content>
 				<Layout.Footer>
 					<Container>

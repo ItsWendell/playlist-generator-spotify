@@ -1,5 +1,15 @@
 import React from 'react';
-import { Image, ContentOverlay, CoverContainer, ContentDetails, ArtistDetail, NameDetail } from './elements';
+
+import {
+	Image,
+	ContentOverlay,
+	CoverContainer,
+	ContentDetails,
+	ArtistDetail,
+	NameDetail,
+	CloseIcon,
+	CloseDiv,
+} from './elements';
 
 export default function Cover(props) {
 	return (
@@ -7,6 +17,15 @@ export default function Cover(props) {
 			<figure>
 				<Image src={props.cover} />
 				<ContentOverlay>
+					{props.onClose && (
+						<CloseDiv>
+							<CloseIcon onClick={(event) => {
+								event.preventDefault();
+								event.stopPropagation();
+								props.onClose && props.onClose(props.id);
+							}} type="close" />
+						</CloseDiv>
+					)}
 					<ContentDetails>
 						<NameDetail>{props.name}</NameDetail>
 						<ArtistDetail>{props.artist}</ArtistDetail>
