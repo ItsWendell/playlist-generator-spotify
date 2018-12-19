@@ -21,14 +21,37 @@ const Cover = styled(SpotifyCover)`
 export default class SpotifySearchBar extends Component {
 	state = {
 		searchType: SEARCH_TRACKS,
+		results: [],
+		placeholderResults: [],
 	};
 
 	searchTypes = [SEARCH_ARTIST, SEARCH_TRACKS];
+
+	componentDidMount() {
+		this.fetchPlaceholderResults();
+	}
+
+	addPlaceholderResults = (items) => {
+		this.setState({
+			placeholderResults: [
+				...this.state.placeholderResults,
+				...items,
+			]
+		});
+	}
+
+	fetchPlaceholderResults = () => {
+		spotifyClient.getMyTopArtists()
+			.then(({ items }) => this.addPlaceholderResults(items));
+		spotifyClient.getMyTopTracks()
+			.then(({ items }) => this.addPlaceholderResults(items));
+	}
 
 	onRadioChange = ({ target: { value }}) => {
 		this.setState({
 			searchType: value,
 			results: [],
+			myTopResults: [],
 			searchValue: undefined,
 		});
 	}
@@ -36,6 +59,9 @@ export default class SpotifySearchBar extends Component {
 	onSearch = (value) => {
 		const { onSearch } = this.props;
 		if (!value) {
+			this.setState({
+				results: [],
+			});
 			return null;
 		}
 		return spotifyClient
@@ -43,7 +69,6 @@ export default class SpotifySearchBar extends Component {
 				limit: 10,
 			})
 			.then((results) => {
-				console.log(results);
 				if (results.artists && results.artists.items.length) {
 					this.setState({ results: results.artists.items });
 				} else if (results.tracks && results.tracks.items.length) {
@@ -51,6 +76,17 @@ export default class SpotifySearchBar extends Component {
 				}
 				onSearch && onSearch(results)
 			});
+	}
+
+	getResults() {
+		if (this.state.results && this.state.results.length) {
+			return this.state.results;
+		}
+
+
+		return this.state.placeholderResults.filter((item) => {
+			return this.state.searchType === SEARCH_TRACKS ? !!item.album : !item.album;
+		});
 	}
 
 	render() {
@@ -78,7 +114,7 @@ export default class SpotifySearchBar extends Component {
 						onChange={onChange}
 						notFoundContent={null}
 					>
-						{(this.state.results || []).map((item) => {
+						{[...this.getResults()].map((item) => {
 							const artist = item.artists && item.artists[0] && item.artists[0].name;
 							const cover = (item.album && item.album.images &&
 								item.album.images.length &&

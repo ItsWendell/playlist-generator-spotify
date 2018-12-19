@@ -119,7 +119,6 @@ class Spotify extends SpotifyAPI {
 			}))
 		);
 	}
-
 }
 
 export const spotifyClient = new Spotify();

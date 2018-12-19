@@ -113,7 +113,6 @@ export default persistReducer(
  */
 export const fetchUser = createAction(FETCH, () => spotifyClient.getMe());
 
-
 export const loginFromBrowserUrl = createAction(LOGIN, async () => {
 	const authTokens = window.location.hash &&
 			new URLSearchParams(window.location.hash.substr(1));

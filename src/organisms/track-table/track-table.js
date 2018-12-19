@@ -11,7 +11,7 @@ const Cover = styled(SpotifyCover)`
     max-width: 4rem;
 `;
 
-export default function TrackTable({ playlists, tracks, loading }) {
+export default function TrackTable({ playlists, tracks, loading, actionColumn = null }) {
 	const dataSource = tracks && tracks
 		// Filter out double track id's
 		.filter((track, index, all) =>
@@ -107,6 +107,12 @@ export default function TrackTable({ playlists, tracks, loading }) {
 		})));
 	}
 
+	if (actionColumn) {
+		columns.push({
+			key: 'action',
+			render: (text, record) => actionColumn(record),
+		});
+	}
 
 	return (
 		<Table
@@ -114,6 +120,7 @@ export default function TrackTable({ playlists, tracks, loading }) {
 			columns={columns}
 			dataSource={dataSource}
 			loading={loading}
+			size="middle"
 		>
 		</Table>
 	);

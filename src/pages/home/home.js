@@ -36,6 +36,7 @@ class App extends Component {
 			selectedGenres: [],
 			selectedSeeds: [],
 			generatedPlaylist: {},
+			playlistAudioFeatures: {},
 			loadingTracks: false,
 		};
 	}
@@ -52,15 +53,6 @@ class App extends Component {
 			.then(() => {
 				spotifyClient.getAvailableGenreSeeds().then((data) => {
 					this.setState({ genreSeeds: data.genres });
-				});
-
-				spotifyClient.getFeaturedPlaylists().then((data) => {
-					this.setState({
-						playlists:
-							data &&
-							data.playlists &&
-							data.playlists.items
-					});
 				});
 			});
 	}
@@ -161,6 +153,29 @@ class App extends Component {
 		);
 	}
 
+	getAudioFeaturesForGeneratedPlaylist() {
+		if (!(this.state.generatedPlaylist && this.state.generatedPlaylist.tracks)) {
+			return null;
+		}
+
+		const tracks = this.state.generatedPlaylist.tracks
+			.filter((track) =>
+				!(track.id in this.state.playlistAudioFeatures)
+			)
+			.map((track) => track.id);
+
+		spotifyClient.getAudioFeaturesForTracks(tracks)
+			.then(({audio_features}) => {
+				this.setState({
+					playlistAudioFeatures: audio_features
+						.reduce((result, item) => {
+							result[item.id] = item;
+							return result;
+						}, {})
+				}, () => console.log(this.state.playlistAudioFeatures));
+			})
+	}
+
 	submitPlaylist = () => {
 		const { audioFeatures, selectedGenres, selectedSeeds } = this.state;
 		this.setState({ loadingTracks: true });
@@ -185,7 +200,9 @@ class App extends Component {
 				seed_tracks: selectedTracks.join(','),
 			})
 			.then((data) => {
-				this.setState({ generatedPlaylist: data });
+				this.setState({ generatedPlaylist: data }, () => {
+					this.getAudioFeaturesForGeneratedPlaylist();
+				});
 			})
 			.finally(() => {
 				this.setState({ loadingTracks: false });
@@ -204,7 +221,15 @@ class App extends Component {
 	}
 
 	onRemoveSeedById = (id) => {
-		this.setState({ selectedSeeds: this.state.selectedSeeds.filter((item) => item.id !== id)});
+		this.setState({
+			selectedSeeds:
+				this.state.selectedSeeds
+					.filter((item) => item.id !== id)
+		}, () => this.submitPlaylist());
+	}
+
+	showFeatures = (item) => {
+		this.setState({ showFeatures: this.state.playlistAudioFeatures[item.id] });
 	}
 
 	getSeedsLeft = () => {
@@ -264,7 +289,13 @@ class App extends Component {
 									<h2>Generated Playlist</h2>
 									<Row align="middle" justify="center">
 										<Col span={24}>
-											<TrackTable loading={this.state.loadingTracks} tracks={this.state.generatedPlaylist && this.state.generatedPlaylist.tracks} />
+											<TrackTable
+												loading={this.state.loadingTracks}
+												tracks={this.state.generatedPlaylist && this.state.generatedPlaylist.tracks}
+												actionColumn={(item) => (
+													<Button icon="info" onMouseDown={() => this.showFeatures(item)}>Show Features</Button>
+												)}
+											/>
 										</Col>
 									</Row>
 								</section>
@@ -308,6 +339,7 @@ class App extends Component {
 										})}
 										onAfterChange={() => this.submitPlaylist()}
 										values={this.state.audioFeatures}
+										showValues={this.state.showFeatures}
 									/>
 								</section>
 							</Layout.Sider>

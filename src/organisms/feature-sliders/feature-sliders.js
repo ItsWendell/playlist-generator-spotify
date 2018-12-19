@@ -4,6 +4,7 @@ import React from 'react';
 import Slider from 'src/atoms/slider';
 import Row from 'src/molecules/row';
 import Col from 'src/molecules/col';
+import Icon from 'src/atoms/icon';
 
 import { Label } from './elements';
 /**
@@ -13,44 +14,65 @@ export const audioFeatures = {
 	"acousticness": 'Acousticness',
 	"danceability": 'Danceability',
 	"energy": 'Energy',
-	"instrumentalness": 'Intrumentalness',
+	"instrumentalness": 'Instrumentalness',
 	"liveness": 'Liveness',
 	"speechiness": 'Speechiness',
 	"valence": 'Positivity',
 };
 
-export default function FeatureSliders({ onChange, onAfterChange, values }) {
+export default function FeatureSliders({ onChange, onAfterChange, values, showValues }) {
+	const tempoMarks = {
+		0: 'Low',
+		300: 'High',
+	};
+	const currentTempoMark = showValues && showValues['tempo'];
+
+	if (currentTempoMark) {
+		tempoMarks[currentTempoMark] = {
+			label: <Icon type="info" />
+		};
+	}
 	return (
 		<Row type="flex" align="middle" justify="center" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-			{ Object.keys(audioFeatures).map((audioFeature) => (
-				<Col
-					key={`slider-${audioFeature}`}
-					span={24}
-				>
-					<Label>
-						{audioFeatures[audioFeature]}
-					</Label>
-					<Slider
-						range
-						marks={{
-							0: 'Low',
-							100: 'High',
-						}}
-						defaultValue={[0, 100]}
-						style={{ width: '100%' }}
-						key={audioFeature}
-						min={0}
-						max={100}
-						step={1}
-						onChange={(values) => {
-							onChange && onChange(audioFeature, values.map((item) => item / 100));
-						}}
-						onAfterChange={(values) => {
-							onAfterChange && onAfterChange(audioFeature, values.map((item) => item / 100));
-						}}
-					/>
-				</Col>
-			)) }
+			{ Object.keys(audioFeatures).map((audioFeature) => {
+				const marks = {
+					0: 'Low',
+					100: 'High',
+				};
+				const currentMark = showValues && showValues[audioFeature] * 100;
+
+				if (currentMark) {
+					marks[currentMark] = {
+						label: <Icon type="info" />
+					};
+				}
+				return (
+					<Col
+						key={`slider-${audioFeature}`}
+						span={24}
+					>
+						<Label>
+							{audioFeatures[audioFeature]}
+						</Label>
+						<Slider
+							range
+							marks={marks}
+							defaultValue={[0, 100]}
+							style={{ width: '100%' }}
+							key={audioFeature}
+							min={0}
+							max={100}
+							step={1}
+							onChange={(values) => {
+								onChange && onChange(audioFeature, values.map((item) => item / 100));
+							}}
+							onAfterChange={(values) => {
+								onAfterChange && onAfterChange(audioFeature, values.map((item) => item / 100));
+							}}
+						/>
+					</Col>
+				)}
+			)}
 			<Col
 				key={`slider-tempo`}
 				span={24}
@@ -62,10 +84,7 @@ export default function FeatureSliders({ onChange, onAfterChange, values }) {
 					range
 					min={0}
 					max={300}
-					marks={{
-						0: 'Low',
-						300: 'High',
-					}}
+					marks={tempoMarks}
 					style={{ width: '100%' }}
 					key='tempo'
 					defaultValue={[0, 300]}
