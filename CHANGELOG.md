@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.1.2...1.2.0) (2018-12-19)
+
+
+### New features
+
+* improve ux and layout, better search and reactivity ([d2bf924](https://github.com/ItsWendell/playlist-generator-spotify/commit/d2bf924))
+
+
+### Other chores
+
+* update packages to latest versions ([987d754](https://github.com/ItsWendell/playlist-generator-spotify/commit/987d754))
+
 ## [1.1.2](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.1.1...1.1.2) (2018-12-15)
 
 
