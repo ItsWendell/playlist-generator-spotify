@@ -33,7 +33,7 @@ export default function FeatureSliders({ onChange, onAfterChange, values, showVa
 		};
 	}
 	return (
-		<Row type="flex" align="middle" justify="center" style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+		<Row type="flex" align="middle" justify="center">
 			{ Object.keys(audioFeatures).map((audioFeature) => {
 				const marks = {
 					0: 'Low',

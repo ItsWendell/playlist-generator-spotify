@@ -1,2 +1,2 @@
-export { default } from './page-hero';
+export { default } from './hero';
 export { HeroTitle, HeroSubtitle } from './elements';

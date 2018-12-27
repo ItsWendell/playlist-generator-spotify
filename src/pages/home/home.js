@@ -16,9 +16,10 @@ import Row from 'src/molecules/row';
 import Col from 'src/molecules/col';
 
 import BackTop from 'src/molecules/back-top';
-import PageHero, { HeroTitle, HeroSubtitle } from 'src/molecules/page-hero';
+import PageHero, { HeroTitle, HeroSubtitle } from 'src/molecules/hero';
 import Cover from 'src/molecules/spotify-cover';
 
+import Icon from 'src/atoms/icon';
 import Container from 'src/atoms/container';
 import Button from 'src/atoms/button';
 import Select from 'src/atoms/select';
@@ -35,6 +36,7 @@ class App extends Component {
 			audioFeatures: {},
 			selectedGenres: [],
 			selectedSeeds: [],
+			selectedTrack: {},
 			generatedPlaylist: {},
 			playlistAudioFeatures: {},
 			loadingTracks: false,
@@ -167,11 +169,14 @@ class App extends Component {
 		spotifyClient.getAudioFeaturesForTracks(tracks)
 			.then(({audio_features}) => {
 				this.setState({
-					playlistAudioFeatures: audio_features
-						.reduce((result, item) => {
-							result[item.id] = item;
-							return result;
-						}, {})
+					playlistAudioFeatures: {
+						...this.state.playlistAudioFeatures,
+						...audio_features
+							.reduce((result, item) => {
+								result[item.id] = item;
+								return result;
+							}, {})
+					}
 				}, () => console.log(this.state.playlistAudioFeatures));
 			})
 	}
@@ -216,7 +221,13 @@ class App extends Component {
 					...this.state.selectedSeeds,
 					item
 				]
-			}, () => this.submitPlaylist());
+			}, () => {
+				this.submitPlaylist();
+				item.artist = item.artists && item.artists[0] && item.artists[0].name;
+				if (item.artist) {
+					this.selectTrack(item);
+				}
+			});
 		}
 	}
 
@@ -228,8 +239,30 @@ class App extends Component {
 		}, () => this.submitPlaylist());
 	}
 
-	showFeatures = (item) => {
-		this.setState({ showFeatures: this.state.playlistAudioFeatures[item.id] });
+	getSelectedTrackFeatures = () => {
+		const { playlistAudioFeatures, selectedTrack } = this.state
+		if (selectedTrack.id) {
+			return playlistAudioFeatures[selectedTrack.id];
+		}
+	}
+
+	fetchAudioFeatures = (trackId) => {
+		spotifyClient.getAudioFeaturesForTrack(trackId).then((audioFeatures) => {
+			this.setState({
+				playlistAudioFeatures: {
+					...this.state.playlistAudioFeatures,
+					[trackId]: audioFeatures
+				}
+			});
+		})
+	}
+
+	selectTrack = (item) => {
+		this.setState({ selectedTrack: item }, () => {
+			if (!this.getSelectedTrackFeatures()) {
+				this.fetchAudioFeatures(item.id);
+			}
+		});
 	}
 
 	getSeedsLeft = () => {
@@ -245,7 +278,8 @@ class App extends Component {
 
 	render () {
 		const { user, logoutAction } = this.props;
-		const { genreSeeds } = this.state;
+		const { genreSeeds, selectedTrack } = this.state;
+		const selectedArtist = selectedTrack && selectedTrack.artist;
 		return (
 			<Layout>
 				<BackTop />
@@ -293,7 +327,12 @@ class App extends Component {
 												loading={this.state.loadingTracks}
 												tracks={this.state.generatedPlaylist && this.state.generatedPlaylist.tracks}
 												actionColumn={(item) => (
-													<Button icon="info" onMouseDown={() => this.showFeatures(item)}>Show Features</Button>
+													<Button
+														icon="info"
+														href="#properties"
+														onClick={() => this.selectTrack(item)}>
+															Show Features
+													</Button>
 												)}
 											/>
 										</Col>
@@ -302,8 +341,7 @@ class App extends Component {
 							</Layout.Content>
 							<Layout.Sider width={300} style={{ backgroundColor: 'transparent' }}>
 								<section id="audio-features">
-									<h2>Audio Features</h2>
-									<h3>Genres</h3>
+									<h2>Genres</h2>
 									<Select
 										allowClear
 										mode="multiple"
@@ -329,7 +367,15 @@ class App extends Component {
 											</Select.Option>
 										))}
 									</Select>
-									<h3>Properties</h3>
+									<h2 id="properties">Audio Features</h2>
+									{selectedTrack && selectedTrack.name &&
+										<p>
+											<Icon type="info" />
+											{
+												`${selectedTrack.name} - ${selectedArtist}`
+											}
+										</p>
+									}
 									<FeatureSliders
 										onChange={(key, value) => this.setState({
 											audioFeatures: {
@@ -339,7 +385,7 @@ class App extends Component {
 										})}
 										onAfterChange={() => this.submitPlaylist()}
 										values={this.state.audioFeatures}
-										showValues={this.state.showFeatures}
+										showValues={this.getSelectedTrackFeatures()}
 									/>
 								</section>
 							</Layout.Sider>

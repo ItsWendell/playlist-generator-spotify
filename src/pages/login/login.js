@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Button from 'src/atoms/button';
 import { spotifyClient } from 'src/providers/spotify';
-import PageHero, { HeroTitle } from 'src/molecules/page-hero';
+import PageHero, { HeroTitle } from 'src/molecules/hero';
 import Container from 'src/atoms/container';
 import { loginFromBrowserUrl, logout, fetchUser } from 'src/ducks/user';
 

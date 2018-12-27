@@ -1,14 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Table from 'src/molecules/table';
 import moment from 'moment';
 
+import Table from 'src/molecules/table';
 import SpotifyCover from 'src/molecules/spotify-cover';
 import Rate from 'src/molecules/rate';
 
 const Cover = styled(SpotifyCover)`
-    max-width: 4rem;
+	max-width: 4rem;
 `;
 
 export default function TrackTable({ playlists, tracks, loading, actionColumn = null }) {
@@ -20,9 +20,8 @@ export default function TrackTable({ playlists, tracks, loading, actionColumn = 
 			))
 		)
 		// Mapping the data only to what we need
-		.map((track, index) => ({
+		.map((track) => ({
 			key: track.id,
-			index: index,
 			id: track.id,
 			name: track.name,
 			previewUrl: track.preview_url,
@@ -31,12 +30,6 @@ export default function TrackTable({ playlists, tracks, loading, actionColumn = 
 			cover: track.album && track.album.images &&
 				track.album.images.length &&
 				track.album.images[0].url,
-			positions: playlists && playlists
-				.reduce((positions, list) => {
-					const position = list.items.findIndex((item) => item.track.id === track.id);
-					positions[list.time_range] = position >= 0 ? position : null;
-					return positions;
-				}, {}),
 			popularity: track.popularity,
 			href: track.external_urls && track.external_urls.spotify,
 		}));
