@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
+import 'styled-components/macro';
 
 import { connect } from 'react-redux';
 import { logout, fetchUser, loginFromBrowserUrl } from 'src/ducks/user';
-import {
-	selectPlaylists,
-	selectPlaylistsLoading,
-	fetchMyTopTracks,
-	selectAllTracks
-} from 'src/ducks/playlists';
 
 import { spotifyClient } from 'src/providers/spotify';
 
@@ -24,6 +19,7 @@ import Container from 'src/atoms/container';
 import Button from 'src/atoms/button';
 import Select from 'src/atoms/select';
 
+import PageHeader from 'src/organisms/page-header';
 import TrackTable from 'src/organisms/track-table/track-table';
 import FeatureSliders from 'src/organisms/feature-sliders/feature-sliders';
 import SearchBar from 'src/organisms/search-bar';
@@ -46,6 +42,7 @@ class App extends Component {
 	initialize() {
 		const { fetchUserAction, logoutAction, tokens } = this.props;
 
+		//
 		if (!spotifyClient.getAccessToken() && tokens) {
 			spotifyClient.setAccessToken(tokens.access_token);
 		}
@@ -60,9 +57,7 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			loginFromBrowserUrlAction
-		} = this.props;
+		const { loginFromBrowserUrlAction } = this.props;
 
 		loginFromBrowserUrlAction()
 			.catch(() => null)
@@ -100,18 +95,18 @@ class App extends Component {
 			}
 		}
 
-		const items = selectedSeeds
-			.map(mapCovers)
+		const items = selectedSeeds.map(mapCovers)
 
 		if (!items.length) {
 			return (<p>Start searching for artists or tracks...</p>);
 		}
+
 		return (
 			<div>
 				<p>Options left including genres: {this.getSeedsLeft()}</p>
-				<Row style={{ flexWrap: 'nowrap' }} type="flex" gutter={16}>
+				<Row css="flex-wrap: no-wrap" type="flex" gutter={16}>
 					{items.map((item) => (
-						<Col style={{ maxWidth: '20%', textAlign: 'center' }} key={item.id}>
+						<Col key={item.id} css="max-width: 20%; text-align: center;">
 							<Cover
 								cover={item.cover}
 								name={item.name}
@@ -119,8 +114,8 @@ class App extends Component {
 								href={item.href}
 								onClose={() => this.onRemoveSeedById(item.id)}
 							/>
-							<div style={{ marginTop: '0.5rem' }}>
-								<label style={{ textAlign: 'center' }}>{item.name}</label>
+							<div css="margin-top: 0.5rem">
+								<label css="text-align: center">{item.name}</label>
 							</div>
 						</Col>
 					))}
@@ -161,13 +156,11 @@ class App extends Component {
 		}
 
 		const tracks = this.state.generatedPlaylist.tracks
-			.filter((track) =>
-				!(track.id in this.state.playlistAudioFeatures)
-			)
+			.filter((track) => !(track.id in this.state.playlistAudioFeatures))
 			.map((track) => track.id);
 
 		spotifyClient.getAudioFeaturesForTracks(tracks)
-			.then(({audio_features}) => {
+			.then(({ audio_features }) => {
 				this.setState({
 					playlistAudioFeatures: {
 						...this.state.playlistAudioFeatures,
@@ -175,10 +168,10 @@ class App extends Component {
 							.reduce((result, item) => {
 								result[item.id] = item;
 								return result;
-							}, {})
+							}, {}),
 					}
-				}, () => console.log(this.state.playlistAudioFeatures));
-			})
+				});
+			});
 	}
 
 	submitPlaylist = () => {
@@ -211,7 +204,7 @@ class App extends Component {
 			})
 			.finally(() => {
 				this.setState({ loadingTracks: false });
-			})
+			});
 	}
 
 	onSelectSeed = (item) => {
@@ -239,11 +232,25 @@ class App extends Component {
 		}, () => this.submitPlaylist());
 	}
 
+	getSeedsLeft = () => {
+		const maxSeeds = 5;
+		const { selectedGenres, selectedSeeds } = this.state;
+		const total = selectedGenres.length + selectedSeeds.length;
+
+		return total <= maxSeeds ? maxSeeds - total : 0;
+	}
+
 	getSelectedTrackFeatures = () => {
 		const { playlistAudioFeatures, selectedTrack } = this.state
-		if (selectedTrack.id) {
-			return playlistAudioFeatures[selectedTrack.id];
-		}
+		return selectedTrack.id ? playlistAudioFeatures[selectedTrack.id] : null;
+	}
+
+	selectTrack = (item) => {
+		this.setState({ selectedTrack: item }, () => {
+			if (!this.getSelectedTrackFeatures()) {
+				this.fetchAudioFeatures(item.id);
+			}
+		});
 	}
 
 	fetchAudioFeatures = (trackId) => {
@@ -257,25 +264,6 @@ class App extends Component {
 		})
 	}
 
-	selectTrack = (item) => {
-		this.setState({ selectedTrack: item }, () => {
-			if (!this.getSelectedTrackFeatures()) {
-				this.fetchAudioFeatures(item.id);
-			}
-		});
-	}
-
-	getSeedsLeft = () => {
-		const maxSeeds = 5;
-		const { selectedGenres, selectedSeeds } = this.state;
-		const total = selectedGenres.length +
-			selectedSeeds.length;
-
-		return total <= maxSeeds ?
-			maxSeeds - total :
-			0;
-	}
-
 	render () {
 		const { user, logoutAction } = this.props;
 		const { genreSeeds, selectedTrack } = this.state;
@@ -283,38 +271,35 @@ class App extends Component {
 		return (
 			<Layout>
 				<BackTop />
-				<Layout.Header style={{ backgroundColor: 'white' }}>
-					<Row gutter={16} type="flex" align="middle" justify="space-between" style={{ height: '100%' }}>
-						<Col span={18}>
-							<h3 style={{ marginBottom: '0' }}>Spotify Playlist Generator</h3>
-						</Col>
-						<Col span={6} style={{ textAlign: 'right' }}>
-							{!user ? (
-								<Button icon="login" type="primary" onClick={() => this.authenticate()}>Login to Spotify</Button>
-							) : (
-								<Button
-									onClick={() => logoutAction()
-										.then(() => window.location.reload())
-									}
-								>
-									Logout
-								</Button>
-							)}
+				<Layout.Header css="&& { background: white; }">
+					<PageHeader logo={(
+						<h3 css="margin-bottom: 0">Spotify Playlist Generator</h3>
+					)}>
+						{!user ? (
+							<Button icon="login" type="primary" onClick={() => this.authenticate()}>Login to Spotify</Button>
+						) : (
 							<Button
-								icon="github"
-								href="https://github.com/ItsWendell/playlist-generator-spotify"
-								style={{ marginLeft: '0.5rem' }}
+								onClick={() => logoutAction()
+									.then(() => window.location.reload())
+								}
 							>
-								It's open source!
+									Logout
 							</Button>
-						</Col>
-					</Row>
+						)}
+						<Button
+							icon="github"
+							href="https://github.com/ItsWendell/playlist-generator-spotify"
+							css="margin-left: 0.5rem"
+						>
+							It's open source!
+						</Button>
+					</PageHeader>
 				</Layout.Header>
 				<Layout.Content>
 					{this.renderHero()}
 					<Container>
 						<Layout>
-							<Layout.Content style={{ paddingRight: '2rem' }}>
+							<Layout.Content css="padding-right: 2rem">
 								<section id="seeds">
 									<h2>Your Seeds</h2>
 									{this.renderSelectedSeeds()}
@@ -339,7 +324,7 @@ class App extends Component {
 									</Row>
 								</section>
 							</Layout.Content>
-							<Layout.Sider width={300} style={{ backgroundColor: 'transparent' }}>
+							<Layout.Sider width={300} css="&& { background-color: transparent }">
 								<section id="audio-features">
 									<h2>Genres</h2>
 									<Select
@@ -353,15 +338,12 @@ class App extends Component {
 												});
 											}
 										}}
-										style={{ width: '100%', textTransform: 'capitalize', marginBottom: '1rem' }}
+										css="&& { width: 100%; margin-bottom: 1rem; }"
 									>
 										{genreSeeds && genreSeeds.map(tag => (
 											<Select.Option
 												key={tag}
-												style={{
-													marginBottom: '1rem',
-													textTransform: 'capitalize',
-												}}
+												css="&& { margin-bottom: 1rem; text-transform: capitalize"
 											>
 												{tag}
 											</Select.Option>
@@ -369,12 +351,7 @@ class App extends Component {
 									</Select>
 									<h2 id="properties">Audio Features</h2>
 									{selectedTrack && selectedTrack.name &&
-										<p>
-											<Icon type="info" />
-											{
-												`${selectedTrack.name} - ${selectedArtist}`
-											}
-										</p>
+										<p><Icon type="info" />{`${selectedTrack.name} - ${selectedArtist}`}</p>
 									}
 									<FeatureSliders
 										onChange={(key, value) => this.setState({
@@ -395,7 +372,7 @@ class App extends Component {
 				<Layout.Footer>
 					<Container>
 						<Row align="middle" justify="center">
-							<Col span={24} style={{ textAlign: 'center' }}>
+							<Col span={24} css="text-align: center;">
 								<Button icon="github" href="https://github.com/ItsWendell/playlist-generator-spotify">It's open source!</Button>
 							</Col>
 						</Row>
@@ -408,14 +385,10 @@ class App extends Component {
 
 export default connect(
 	state => ({
-		playlists: selectPlaylists(state),
-		allTracks: selectAllTracks(state),
-		isLoading: selectPlaylistsLoading(state),
 		user: state && state.user && state.user.user,
 		tokens: state && state.user && state.user.tokens,
 	}),
 	{
-		fetchMyTopTracksAction: fetchMyTopTracks,
 		fetchUserAction: fetchUser,
 		logoutAction: logout,
 		loginFromBrowserUrlAction: loginFromBrowserUrl

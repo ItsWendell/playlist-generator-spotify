@@ -1,5 +1,6 @@
 
 import React from 'react';
+import 'styled-components/macro';
 
 import Slider from 'src/atoms/slider';
 import Row from 'src/molecules/row';
@@ -58,7 +59,7 @@ export default function FeatureSliders({ onChange, onAfterChange, values, showVa
 							range
 							marks={marks}
 							defaultValue={[0, 100]}
-							style={{ width: '100%' }}
+							css="width: 100%"
 							key={audioFeature}
 							min={0}
 							max={100}
@@ -85,7 +86,7 @@ export default function FeatureSliders({ onChange, onAfterChange, values, showVa
 					min={0}
 					max={300}
 					marks={tempoMarks}
-					style={{ width: '100%' }}
+					css="width: 100%"
 					key='tempo'
 					defaultValue={[0, 300]}
 					step={2}

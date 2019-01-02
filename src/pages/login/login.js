@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import 'styled-components/macro';
 import { Redirect } from 'react-router-dom';
 
 import { connect } from 'react-redux';
@@ -61,7 +62,7 @@ class Login extends Component {
 				fullPage={true}
 				center
 			>
-				<Container style={{ textAlign: 'center' }}>
+				<Container css="text-align: center">
 					<HeroTitle>Discover Your Personal Taste Over Time on Spotify</HeroTitle>
 					<Button
 						size="default"

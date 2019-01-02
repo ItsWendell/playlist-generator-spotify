@@ -104,7 +104,7 @@ export default class SpotifySearchBar extends Component {
 								'Searching Tracks'
 						}
 						width="100%"
-						style={{ minWidth: '30rem' }}
+						css="min-width: 30rem"
 						size="large"
 						value={this.state.searchValue}
 						showArrow={false}
@@ -127,17 +127,17 @@ export default class SpotifySearchBar extends Component {
 									this.setState({ searchValue: undefined });
 									onSelect(item)
 								}} key={item.id}>
-									<Row gutter={8} type="flex" align="middle" style={{ flexWrap: 'nowrap' }}>
+									<Row gutter={8} type="flex" align="middle" css="flex-wrap: nowrap">
 										<Col>
-											<Cover style={{ paddingTop: '0.2rem', paddingBottom: '0.2rem' }} cover={cover}></Cover>
+											<Cover css="padding-top: 0.2rem; padding-bottom: 0.2rem" cover={cover}></Cover>
 										</Col>
 										<Col>
-											<label style={{
-												textOverflow: 'ellipsis',
-												maxWidth: '100%',
-												whiteSpace: 'nowrap',
-												overflow: 'hidden',
-											}}>
+											<label css={`
+												text-overflow: ellipsis;
+												max-width: 100%;
+												white-space: nowrap;
+												overflow: hidden;
+											`}>
 												{name}
 											</label>
 										</Col>
@@ -159,7 +159,7 @@ export default class SpotifySearchBar extends Component {
 						>
 							{this.searchTypes.map((type) => (
 								<Radio.Button key={type} value={type}>
-									<span style={{ textTransform: 'capitalize' }}>
+									<span css="text-transform: capitalize">
 										{type}
 									</span>
 								</Radio.Button>
