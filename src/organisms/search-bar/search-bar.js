@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 import Radio from 'src/atoms/radio';
 import Select from 'src/atoms/select';
@@ -82,7 +82,6 @@ export default class SpotifySearchBar extends Component {
 		if (this.state.results && this.state.results.length) {
 			return this.state.results;
 		}
-
 
 		return this.state.placeholderResults.filter((item) => {
 			return this.state.searchType === SEARCH_TRACKS ? !!item.album : !item.album;
