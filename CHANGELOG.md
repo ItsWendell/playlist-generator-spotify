@@ -1,3 +1,32 @@
+# [1.3.0](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.2.0...1.3.0) (2019-01-12)
+
+
+### Bug fixes
+
+* inline css prop styled components for search bar ([2873d51](https://github.com/ItsWendell/playlist-generator-spotify/commit/2873d51))
+
+
+### Code refactors
+
+* remove unused theme provider file ([c8214a5](https://github.com/ItsWendell/playlist-generator-spotify/commit/c8214a5))
+* use styled-components css prop macro + minor code improvements ([842d0d5](https://github.com/ItsWendell/playlist-generator-spotify/commit/842d0d5))
+
+
+### Code style changes
+
+* update hero to smaller size for search bar ([8a74bce](https://github.com/ItsWendell/playlist-generator-spotify/commit/8a74bce))
+
+
+### New features
+
+* initial top tracks and artist + track audio properties ([c4ba32d](https://github.com/ItsWendell/playlist-generator-spotify/commit/c4ba32d))
+* minor refactoring and view track audio features ([f204f62](https://github.com/ItsWendell/playlist-generator-spotify/commit/f204f62))
+
+
+### Other chores
+
+* upgrade packages and fix react scripts build fail ([e840b9c](https://github.com/ItsWendell/playlist-generator-spotify/commit/e840b9c))
+
 # [1.2.0](https://github.com/ItsWendell/playlist-generator-spotify/compare/1.1.2...1.2.0) (2018-12-19)
 
 
